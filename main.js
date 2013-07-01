@@ -60,7 +60,7 @@ function init2()
 		}
 	},function(error)
 	{
-		console.log("No se ha podido crear el mapa: ", dojo.toJson(error),error);
+		console.log("Can't create map: ", dojo.toJson(error),error);
 	});
 
 }
@@ -83,7 +83,7 @@ function initMap()
 
 	var template = new esri.InfoTemplate();
 	template.setTitle("<img src='http://79.125.13.101/flags/${COUNTRY:toLower}.png'/> <b>${NAME}</b>");
-	template.setContent("<img class='thumbnail' width='150px' height='112px' src='${THUMBNAIL}' onerror='this.src=\"noimage.png\"'/><br/><b>Rumbo: </b>${COURSE}º<br /><b>Velocidad:</b> ${SPEED:divideByTen} kt")
+	template.setContent("<img class='thumbnail' width='150px' height='112px' src='${THUMBNAIL}' onerror='this.src=\"noimage.png\"'/><br/><b>Course: </b>${COURSE}º<br /><b>Speed:</b> ${SPEED:divideByTen} kt")
 
 	var infoWindowLite = new esri.dijit.InfoWindowLite(null, dojo.create("div",null,map.root));
 	infoWindowLite.startup();
@@ -134,7 +134,7 @@ function initMap()
 	{
 		var elapsed = new Date().getTime() - updateStartTime;
 		//console.log("elapsed: " + elapsed/1000 + " sec.");
-		dojo.byId('elapsed').innerHTML = "<b>Tiempo:</b> " + elapsed/1000 + " sec.";
+		dojo.byId('elapsed').innerHTML = "<b>Refresh time:</b> " + elapsed/1000 + " sec.";
 		//dojo.byId('elapsed').innerHTML = "";
 		waiting = false;
 
@@ -221,7 +221,7 @@ function updateStats()
 				countryCounts += "<li>" + img + " " + feature.attributes.shipCount + "</li>";
 				total += feature.attributes.shipCount;
 			});
-			dojo.byId('shipcount').innerHTML = "<b>Nº de Barcos: </b>" + total + "<br/><ul>" + countryCounts + "</ul>";
+			dojo.byId('shipcount').innerHTML = "<b>Vessel count: </b>" + total + "<br/><ul>" + countryCounts + "</ul>";
 		},
 		function(error)
 		{
