@@ -134,7 +134,7 @@ function initMap()
 	{
 		var elapsed = new Date().getTime() - updateStartTime;
 		//console.log("elapsed: " + elapsed/1000 + " sec.");
-		dojo.byId('elapsed').innerHTML = "<b>Refresh time:</b> " + elapsed/1000 + " sec.";
+		dojo.byId('elapsed').innerHTML = "<b>Refresh:</b> " + elapsed/1000 + " sec.";
 		//dojo.byId('elapsed').innerHTML = "";
 		waiting = false;
 
