@@ -25,15 +25,19 @@ body
 	margin: 0;
 }
 
-#info, #footer
+#info, #footer, #controls
 {
-	position: absolute;
-	right:20px;
-	width: 150px;
+	position: absolute;	
 	z-index: 10;
-	background: rgba(255,255,255,0.4);	
 	padding: 10px;
 	font-size: 14px;
+}
+
+#info, #footer
+{
+	right:20px;
+	width: 150px;
+	background: rgba(255,255,255,0.4);	
 }
 
 #info
@@ -61,6 +65,42 @@ body
 	list-style: none;
 	padding: 0px;
 
+}
+
+#controls
+{
+	bottom: 20px;
+	left: 20px;
+}
+
+#controls ul
+{
+	padding: 0;
+	margin: 0;
+}
+
+#controls li
+{
+	display: inline-block;
+	cursor: pointer;
+	height: 18px;
+	color: #666;
+	border: 2px #666 solid;
+	border-radius: 5px;
+	padding: 5px;
+	background: rgba(255,255,255,0.4);	
+}
+
+#controls li:hover
+{
+	background: #fff;
+}
+
+#controls li.selected
+{
+	background: #eee;
+	border-color: #000;
+	color: #000;
 }
 
 .simpleInfoWindow .close

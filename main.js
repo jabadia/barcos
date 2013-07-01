@@ -122,7 +122,14 @@ function initMap()
 	dojo.connect(map,'onPanEnd',updateStats);
 	dojo.connect(map,'onZoomEnd',updateStats);
 
+	dojo.connect(dojo.byId('play'), 'onclick', play );
+	dojo.connect(dojo.byId('stop'), 'onclick', stop );
+	dojo.connect(dojo.byId('showHistory'), 'onclick', showHistory );
+	dojo.connect(dojo.byId('hideHistory'), 'onclick', hideHistory );
+	dojo.connect(dojo.byId('clearHistory'), 'onclick', clearHistory );
+
 	updateStats();
+	hideHistory();
 	play();
 }
 
@@ -134,12 +141,16 @@ function play()
 		refresh();
 		console.log("playing");
 	}
+	dojo.addClass('play','selected');
+	dojo.removeClass('stop','selected');
 }
 
 function stop()
 {
 	playing = false;
 	console.log("stopped");
+	dojo.removeClass('play','selected');
+	dojo.addClass('stop','selected');
 }
 
 function updateStats()
@@ -198,6 +209,9 @@ function refresh()
 
 function clearHistory()
 {
+	if( !confirm("This will empty all features from ships and history layers. Continue?") )
+		return;
+	
 	[0,1].forEach(function(layerId)
 	{
 		var deleteUrl = shipsFeatureUrl + '/' + layerId + '/deleteFeatures';
@@ -227,11 +241,15 @@ function clearHistory()
 
 function showHistory()
 {
+	dojo.addClass('showHistory','selected');
+	dojo.removeClass('hideHistory','selected');
 	shipsLayer.setVisibleLayers([0,1]);
 }
 
 function hideHistory()
 {
+	dojo.removeClass('showHistory','selected');
+	dojo.addClass('hideHistory','selected');
 	shipsLayer.setVisibleLayers([0]);
 }
 
