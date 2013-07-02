@@ -14,6 +14,9 @@ var shipsFeatureLayer;
 var waiting = false;
 var playing = false;
 
+var historyVisible = false;
+var alertsVisible = false;
+
 var hostUrl = "http://79.125.13.101:6080/arcgis/rest/services";
 var shipsUrl          = hostUrl + "/GEP_barcos/Barcos_Vigo/MapServer";
 var shipsFeatureUrl   = hostUrl + "/GEP_barcos/Barcos_Vigo/FeatureServer";
@@ -30,7 +33,7 @@ function init()
 	var options = {
 		basemap: "gray",
 		center: [-9, 42],
-		zoom: 10
+		zoom: 9
 	};
 
 	map = new esri.Map("map", options);
@@ -66,7 +69,7 @@ function initMap()
 	var infoWindowLite = new esri.dijit.InfoWindowLite(null, dojo.create("div",null,map.root));
 	infoWindowLite.startup();
 	map.setInfoWindow(infoWindowLite);
-	map.infoWindow.resize(155, 190);
+	map.infoWindow.resize(155, 206);
 
 	shipsFeatureLayer = new esri.layers.FeatureLayer(shipsFeatureUrl + "/0",
 	{
@@ -93,7 +96,7 @@ function initMap()
 	});
 	dojo.connect(shipsFeatureLayer,"onMouseOut", function(evt)
 	{
-		map.infoWindow.hide();
+		window.setTimeout(function() { map.infoWindow.hide() }, 500);
 	})
 
 	map.addLayers([nauticalChartLayer,protectedAreasLayer,shipsLayer,shipsFeatureLayer]);
@@ -127,10 +130,13 @@ function initMap()
 	dojo.connect(dojo.byId('stop'), 'onclick', stop );
 	dojo.connect(dojo.byId('showHistory'), 'onclick', showHistory );
 	dojo.connect(dojo.byId('hideHistory'), 'onclick', hideHistory );
+	dojo.connect(dojo.byId('showAlerts'), 'onclick', showAlerts );
+	dojo.connect(dojo.byId('hideAlerts'), 'onclick', hideAlerts );
 	dojo.connect(dojo.byId('clearHistory'), 'onclick', clearHistory );
 
 	updateStats();
 	hideHistory();
+	hideAlerts();
 	play();
 }
 
@@ -240,32 +246,58 @@ function clearHistory()
 	})
 }
 
+function setLayerVisibility()
+{
+	if( historyVisible )
+	{
+		dojo.addClass('showHistory','selected');
+		dojo.removeClass('hideHistory','selected');
+	}
+	else
+	{
+		dojo.removeClass('showHistory','selected');
+		dojo.addClass('hideHistory','selected');
+	}
+
+	if( alertsVisible )
+	{
+		dojo.addClass('showAlerts','selected');
+		dojo.removeClass('hideAlerts','selected');
+	}
+	else
+	{
+		dojo.removeClass('showAlerts','selected');
+		dojo.addClass('hideAlerts','selected');
+	}
+
+	var visibleLayers = [0];
+	if( historyVisible ) visibleLayers.push(1);
+	if( alertsVisible ) visibleLayers.push(2);
+	shipsLayer.setVisibleLayers(visibleLayers);
+}
+
 function showHistory()
 {
-	dojo.addClass('showHistory','selected');
-	dojo.removeClass('hideHistory','selected');
-	shipsLayer.setVisibleLayers([0,1]);
+	historyVisible = true;
+	setLayerVisibility();
 }
 
 function hideHistory()
 {
-	dojo.removeClass('showHistory','selected');
-	dojo.addClass('hideHistory','selected');
-	shipsLayer.setVisibleLayers([0]);
+	historyVisible = false;
+	setLayerVisibility();
 }
 
 function showAlerts()
 {
-	//dojo.addClass('showHistory','selected');
-	//dojo.removeClass('hideHistory','selected');
-	shipsLayer.setVisibleLayers([0,2]);
+	alertsVisible = true;
+	setLayerVisibility();
 }
 
 function hideAlerts()
 {
-	//dojo.removeClass('showHistory','selected');
-	//dojo.addClass('hideHistory','selected');
-	shipsLayer.setVisibleLayers([0]);
+	alertsVisible = false;
+	setLayerVisibility();
 }
 
 dojo.addOnLoad(init);

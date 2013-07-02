@@ -73,30 +73,33 @@ body
 	left: 20px;
 }
 
-#controls ul
+#controls span
 {
-	padding: 0;
-	margin: 0;
+	display: inline-block;
+	width: 60px;
 }
 
-#controls li
+#controls div
 {
 	display: inline-block;
 	cursor: pointer;
 	height: 18px;
+	width: 35px;
+	text-align: center;
 	color: #666;
 	border: 2px #666 solid;
 	border-radius: 5px;
 	padding: 5px;
+	margin: 2px 0px;
 	background: rgba(255,255,255,0.4);	
 }
 
-#controls li:hover
+#controls div:hover
 {
 	background: #fff;
 }
 
-#controls li.selected
+#controls div.selected
 {
 	background: #eee;
 	border-color: #000;
@@ -112,4 +115,5 @@ body
 {
 	width: 150px;
 	height: 112px;
+	background: #f0f0f0 url(loading.gif) no-repeat center center;	
 }
