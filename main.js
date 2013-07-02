@@ -17,6 +17,8 @@ var playing = false;
 var historyVisible = false;
 var alertsVisible = false;
 
+var infoWindowTimeout = null;
+
 var hostUrl = "http://79.125.13.101:6080/arcgis/rest/services";
 var shipsUrl          = hostUrl + "/GEP_barcos/Barcos_Vigo/MapServer";
 var shipsFeatureUrl   = hostUrl + "/GEP_barcos/Barcos_Vigo/FeatureServer";
@@ -91,12 +93,14 @@ function initMap()
 			var g = evt.graphic;
 			map.infoWindow.setContent(g.getContent());
 			map.infoWindow.setTitle(g.getTitle());
+			cancelInfoWindowTimeout();
 			map.infoWindow.show( evt.screenPoint, map.getInfoWindowAnchor(evt.screenPoint));
 		}
 	});
 	dojo.connect(shipsFeatureLayer,"onMouseOut", function(evt)
 	{
-		window.setTimeout(function() { map.infoWindow.hide() }, 500);
+		cancelInfoWindowTimeout();
+		infoWindowTimeout = window.setTimeout(function() { map.infoWindow.hide() }, 500);
 	})
 
 	map.addLayers([nauticalChartLayer,protectedAreasLayer,shipsLayer,shipsFeatureLayer]);
@@ -138,6 +142,15 @@ function initMap()
 	hideHistory();
 	hideAlerts();
 	play();
+}
+
+function cancelInfoWindowTimeout()
+{
+	if( infoWindowTimeout )
+	{
+		window.clearTimeout(infoWindowTimeout);
+		infoWindowTimeout = null;
+	}
 }
 
 function play()
