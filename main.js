@@ -52,7 +52,8 @@ function initMap()
 
 	// protected areas layer
 	var protectedAreasLayer = new esri.layers.ArcGISDynamicMapServiceLayer(protectedAreasUrl);
-
+	
+	
 	// ships layer
 	shipsLayer = new esri.layers.ArcGISDynamicMapServiceLayer(shipsUrl);
 	shipsLayer.setDisableClientCaching(true);
@@ -212,7 +213,7 @@ function clearHistory()
 	if( !confirm("This will empty all features from ships and history layers. Continue?") )
 		return;
 	
-	[0,1].forEach(function(layerId)
+	[0,1,2].forEach(function(layerId)
 	{
 		var deleteUrl = shipsFeatureUrl + '/' + layerId + '/deleteFeatures';
 		console.log("deleting: " + deleteUrl);
@@ -250,6 +251,20 @@ function hideHistory()
 {
 	dojo.removeClass('showHistory','selected');
 	dojo.addClass('hideHistory','selected');
+	shipsLayer.setVisibleLayers([0]);
+}
+
+function showAlerts()
+{
+	//dojo.addClass('showHistory','selected');
+	//dojo.removeClass('hideHistory','selected');
+	shipsLayer.setVisibleLayers([0,2]);
+}
+
+function hideAlerts()
+{
+	//dojo.removeClass('showHistory','selected');
+	//dojo.addClass('hideHistory','selected');
 	shipsLayer.setVisibleLayers([0]);
 }
 
