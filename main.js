@@ -11,6 +11,7 @@ var map;
 
 var shipsLayer;
 var shipsFeatureLayer;
+var nauticalChartLayer;
 var waiting = false;
 var playing = false;
 
@@ -53,7 +54,7 @@ function initMap()
 	// -- layers
 
 	// nautical chart layer (S-57)
-	var nauticalChartLayer = new esri.layers.ArcGISDynamicMapServiceLayer(nauticalChartUrl);
+	nauticalChartLayer = new esri.layers.ArcGISDynamicMapServiceLayer(nauticalChartUrl);
 
 	// protected areas layer
 	var protectedAreasLayer = new esri.layers.ArcGISDynamicMapServiceLayer(protectedAreasUrl);
@@ -137,10 +138,13 @@ function initMap()
 	dojo.connect(dojo.byId('showAlerts'), 'onclick', showAlerts );
 	dojo.connect(dojo.byId('hideAlerts'), 'onclick', hideAlerts );
 	dojo.connect(dojo.byId('clearHistory'), 'onclick', clearHistory );
+	dojo.connect(dojo.byId('showChart'), 'onclick', showChart );
+	dojo.connect(dojo.byId('hideChart'), 'onclick', hideChart );
 
 	updateStats();
 	hideHistory();
 	hideAlerts();
+	hideChart();
 	play();
 }
 
@@ -311,6 +315,20 @@ function hideAlerts()
 {
 	alertsVisible = false;
 	setLayerVisibility();
+}
+
+function showChart()
+{
+	nauticalChartLayer.setVisibility(true);
+	dojo.addClass('showChart','selected');
+	dojo.removeClass('hideChart','selected');
+}
+
+function hideChart()
+{
+	nauticalChartLayer.setVisibility(false);
+	dojo.removeClass('showChart','selected');
+	dojo.addClass('hideChart','selected');
 }
 
 dojo.addOnLoad(init);
