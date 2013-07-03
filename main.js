@@ -12,6 +12,8 @@ var map;
 var shipsLayer;
 var shipsFeatureLayer;
 var nauticalChartLayer;
+var protectedAreasLayer;
+
 var waiting = false;
 var playing = false;
 
@@ -57,7 +59,7 @@ function initMap()
 	nauticalChartLayer = new esri.layers.ArcGISDynamicMapServiceLayer(nauticalChartUrl);
 
 	// protected areas layer
-	var protectedAreasLayer = new esri.layers.ArcGISDynamicMapServiceLayer(protectedAreasUrl);
+	protectedAreasLayer = new esri.layers.ArcGISDynamicMapServiceLayer(protectedAreasUrl);
 	
 	
 	// ships layer
@@ -133,10 +135,12 @@ function initMap()
 
 	dojo.connect(dojo.byId('play'), 'onclick', play );
 	dojo.connect(dojo.byId('stop'), 'onclick', stop );
-	dojo.connect(dojo.byId('showHistory'), 'onclick', showHistory );
-	dojo.connect(dojo.byId('hideHistory'), 'onclick', hideHistory );
 	dojo.connect(dojo.byId('showAlerts'), 'onclick', showAlerts );
 	dojo.connect(dojo.byId('hideAlerts'), 'onclick', hideAlerts );
+	dojo.connect(dojo.byId('showProtectedAreas'), 'onclick', showProtectedAreas );
+	dojo.connect(dojo.byId('hideProtectedAreas'), 'onclick', hideProtectedAreas );
+	dojo.connect(dojo.byId('showHistory'), 'onclick', showHistory );
+	dojo.connect(dojo.byId('hideHistory'), 'onclick', hideHistory );
 	dojo.connect(dojo.byId('clearHistory'), 'onclick', clearHistory );
 	dojo.connect(dojo.byId('showChart'), 'onclick', showChart );
 	dojo.connect(dojo.byId('hideChart'), 'onclick', hideChart );
@@ -145,6 +149,7 @@ function initMap()
 	hideHistory();
 	hideAlerts();
 	hideChart();
+	hideProtectedAreas();
 	play();
 }
 
@@ -329,6 +334,20 @@ function hideChart()
 	nauticalChartLayer.setVisibility(false);
 	dojo.removeClass('showChart','selected');
 	dojo.addClass('hideChart','selected');
+}
+
+function showProtectedAreas()
+{
+	protectedAreasLayer.setVisibility(true);
+	dojo.addClass('showProtectedAreas','selected');
+	dojo.removeClass('hideProtectedAreas','selected');
+}
+
+function hideProtectedAreas()
+{
+	protectedAreasLayer.setVisibility(false);
+	dojo.removeClass('showProtectedAreas','selected');
+	dojo.addClass('hideProtectedAreas','selected');
 }
 
 dojo.addOnLoad(init);
