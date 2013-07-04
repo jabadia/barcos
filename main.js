@@ -22,12 +22,6 @@ var alertsVisible = false;
 
 var infoWindowTimeout = null;
 
-var hostUrl = "http://79.125.13.101:6080/arcgis/rest/services";
-var shipsUrl          = hostUrl + "/GEP_barcos/Barcos_Vigo/MapServer";
-var shipsFeatureUrl   = hostUrl + "/GEP_barcos/Barcos_Vigo/FeatureServer";
-var protectedAreasUrl = hostUrl + "/GEP_barcos/Reserva_Marina/MapServer";
-var nauticalChartUrl  = hostUrl + "/s57/RegMar/MapServer/exts/Maritime%20Chart%20Server/MapServer";
-
 function init()
 {
 	esriConfig.defaults.map.panDuration = 500;	// time in milliseconds, default panDuration: 250
@@ -56,14 +50,14 @@ function initMap()
 	// -- layers
 
 	// nautical chart layer (S-57)
-	nauticalChartLayer = new esri.layers.ArcGISDynamicMapServiceLayer(nauticalChartUrl);
+	nauticalChartLayer = new esri.layers.ArcGISDynamicMapServiceLayer(config.nauticalChartUrl);
 
 	// protected areas layer
-	protectedAreasLayer = new esri.layers.ArcGISDynamicMapServiceLayer(protectedAreasUrl);
+	protectedAreasLayer = new esri.layers.ArcGISDynamicMapServiceLayer(config.protectedAreasUrl);
 	
 	
 	// ships layer
-	shipsLayer = new esri.layers.ArcGISDynamicMapServiceLayer(shipsUrl);
+	shipsLayer = new esri.layers.ArcGISDynamicMapServiceLayer(config.shipsUrl);
 	shipsLayer.setDisableClientCaching(true);
 
 	// feture layer to show popups
@@ -76,7 +70,7 @@ function initMap()
 	map.setInfoWindow(infoWindowLite);
 	map.infoWindow.resize(155, 206);
 
-	shipsFeatureLayer = new esri.layers.FeatureLayer(shipsFeatureUrl + "/0",
+	shipsFeatureLayer = new esri.layers.FeatureLayer(config.shipsFeatureUrl + "/0",
 	{
 		mode: esri.layers.FeatureLayer.MODE_ONDEMAND,
 		outFields: ["*"],
@@ -184,7 +178,7 @@ function stop()
 
 function updateStats()
 {
-	var statsTask = new esri.tasks.QueryTask(shipsUrl + "/0");
+	var statsTask = new esri.tasks.QueryTask(config.shipsUrl + "/0");
 	var query = new esri.tasks.Query();
 	var statsDef1 = new esri.tasks.StatisticDefinition();
 
@@ -243,7 +237,7 @@ function clearHistory()
 	
 	[0,1,2].forEach(function(layerId)
 	{
-		var deleteUrl = shipsFeatureUrl + '/' + layerId + '/deleteFeatures';
+		var deleteUrl = config.shipsFeatureUrl + '/' + layerId + '/deleteFeatures';
 		console.log("deleting: " + deleteUrl);
 		var deleteRequest = esri.request({
 			url: deleteUrl,
@@ -293,8 +287,8 @@ function setLayerVisibility()
 	}
 
 	var visibleLayers = [0];
-	if( historyVisible ) visibleLayers.push(1);
-	if( alertsVisible ) visibleLayers.push(2);
+	if( alertsVisible ) visibleLayers.push(1);
+	if( historyVisible ) visibleLayers.push(2);
 	shipsLayer.setVisibleLayers(visibleLayers);
 }
 
