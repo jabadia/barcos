@@ -43,7 +43,7 @@ function init()
 
 function divideByTen(value,key,data) {	return String(value / 10); }
 function toLower(value,key,data) { return value.toLowerCase(); }
-
+function getTypeName(value,key,data) { return shipsFeatureLayer.types.filter(function(t){ return t.id==value; })[0].name}
 
 function initMap()
 {
@@ -63,12 +63,14 @@ function initMap()
 	// feture layer to show popups
 	var template = new esri.InfoTemplate();
 	template.setTitle("<img src='http://79.125.13.101/flags/${COUNTRY:toLower}.png'/> <b>${NAME}</b>");
-	template.setContent("<img class='thumbnail' width='150px' height='112px' src='${THUMBNAIL}' onerror='this.src=\"noimage.png\"'/><br/><b>Course: </b>${COURSE}º<br /><b>Speed:</b> ${SPEED:divideByTen} kt")
+	template.setContent("<img class='thumbnail' width='150px' height='112px' src='${THUMBNAIL}' onerror='this.src=\"noimage.png\"'/><br/>" + 
+		"<span class='label'>Ship Type</span>${SHIP_TYPE:getTypeName}<br />" +
+		"<span class='label'>Course</span>${COURSE}º<br />" +
+		"<span class='label'>Speed</span>${SPEED:divideByTen} kt")
 
 	var infoWindowLite = new esri.dijit.InfoWindowLite(null, dojo.create("div",null,map.root));
 	infoWindowLite.startup();
 	map.setInfoWindow(infoWindowLite);
-	map.infoWindow.resize(155, 206);
 
 	shipsFeatureLayer = new esri.layers.FeatureLayer(config.shipsFeatureUrl + "/0",
 	{
@@ -88,6 +90,7 @@ function initMap()
 		//if( map.getScale() < 600000 )
 		{		
 			var g = evt.graphic;
+			map.infoWindow.resize(155, 200);
 			map.infoWindow.setContent(g.getContent());
 			map.infoWindow.setTitle(g.getTitle());
 			cancelInfoWindowTimeout();

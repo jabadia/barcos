@@ -106,6 +106,21 @@ body
 	color: #000;
 }
 
+.simpleInfoWindow .title
+{
+	width: 146px;
+	margin: 0 2px;
+	padding 2px;
+	border: none;
+	background: #555;
+	color: #fff;
+}
+
+.simpleInfoWindow .content
+{
+	overflow: hidden;
+}
+
 .simpleInfoWindow .close
 {
 	display: none;
@@ -116,4 +131,11 @@ body
 	width: 150px;
 	height: 112px;
 	background: #f0f0f0 url(loading.gif) no-repeat center center;	
+}
+
+.simpleInfoWindow .label
+{
+	display: inline-block;
+	width: 75px;
+	font-weight: bold;
 }
