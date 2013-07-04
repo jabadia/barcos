@@ -139,6 +139,15 @@ function initMap()
 	dojo.connect(dojo.byId('showChart'), 'onclick', showChart );
 	dojo.connect(dojo.byId('hideChart'), 'onclick', hideChart );
 
+	dojo.connect(dojo.byId('footer'), 'onmouseover', function()
+	{
+		dojo.byId('hosturl').innerHTML = hostUrl.split('/')[2];
+	});
+	dojo.connect(dojo.byId('footer'), 'onmouseout', function()
+	{
+		dojo.byId('hosturl').innerHTML = "";
+	});
+
 	updateStats();
 	hideHistory();
 	hideAlerts();
