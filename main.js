@@ -62,7 +62,7 @@ function initMap()
 
 	// feture layer to show popups
 	var template = new esri.InfoTemplate();
-	template.setTitle("<img src='http://79.125.13.101/flags/${COUNTRY:toLower}.png'/> <b>${NAME}</b>");
+	template.setTitle("<img src='http://www.esridemos.com/flags/${COUNTRY:toLower}.png'/> <b>${NAME}</b>");
 	template.setContent("<img class='thumbnail' width='150px' height='112px' src='${THUMBNAIL}' onerror='this.src=\"noimage.png\"'/><br/>" + 
 		"<span class='label'>Ship Type</span>${SHIP_TYPE:getTypeName}<br />" +
 		"<span class='label'>Course</span>${COURSE}º<br />" +
@@ -217,7 +217,7 @@ function updateStats()
 			var countryCounts = "";
 			var totalCount = 0;
 			result.features.forEach(function(feature) {
-				var imgUrl = "http://79.125.13.101/flags/" + feature.attributes.COUNTRY.toLowerCase() + ".png";
+				var imgUrl = "http://www.esridemos.com/flags/" + feature.attributes.COUNTRY.toLowerCase() + ".png";
 				var img = "<img src='"+imgUrl+"' />";
 				countryCounts += "<li>" + img + " " + feature.attributes.shipCount + "</li>";
 				totalCount += feature.attributes.shipCount;
