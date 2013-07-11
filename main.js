@@ -30,12 +30,23 @@ function init()
 	esriConfig.defaults.map.zoomRate = 1; 		// default zoomRate: 25
 
 	var options = {
+//		basemap: "satellite",
 		basemap: "gray",
-		center: [-9, 42],
+		//center: [-9, 42],	// costa gallega
+		center: [-5.36, 36],	// estrecho de gibraltar
 		zoom: 9
 	};
 
 	map = new esri.Map("map", options);
+
+	/*
+	var url = "http://tile.cloudmade.com/1a1b06b230af4efdbb989ea99e9841af/999/256/${level}/${col}/${row}.png";
+//	var url = "http://${subDomain}.tiles.mapbox.com/v3/mapbox.control-room/${level}/${col}/${row}.png";
+	//var options = { subDomains: ["a","b","c","d"] };
+	var options = {};
+	var base = new esri.layers.WebTiledLayer(url,options);
+	map.addLayer(base); 
+	*/
 
 	initMap();
 };
@@ -54,11 +65,13 @@ function initMap()
 
 	// protected areas layer
 	protectedAreasLayer = new esri.layers.ArcGISDynamicMapServiceLayer(config.protectedAreasUrl);
+	protectedAreasLayer.setImageFormat('png32');
 	
 	
 	// ships layer
 	shipsLayer = new esri.layers.ArcGISDynamicMapServiceLayer(config.shipsUrl);
 	shipsLayer.setDisableClientCaching(true);
+	shipsLayer.setImageFormat('png32');
 
 	// feture layer to show popups
 	var template = new esri.InfoTemplate();
@@ -108,6 +121,7 @@ function initMap()
 
 	// -- measure refresh time
 	var updateStartTime;
+	var timerId;
 	dojo.connect(shipsLayer,"onUpdateStart", function()
 	{
 		updateStartTime = new Date().getTime();
@@ -122,7 +136,7 @@ function initMap()
 
 		if( playing )
 		{
-			window.setTimeout(refresh,2500);
+			window.setTimeout( refresh,2500);
 		}		
 	})
 
@@ -141,6 +155,8 @@ function initMap()
 	dojo.connect(dojo.byId('clearHistory'), 'onclick', clearHistory );
 	dojo.connect(dojo.byId('showChart'), 'onclick', showChart );
 	dojo.connect(dojo.byId('hideChart'), 'onclick', hideChart );
+	dojo.connect(dojo.byId('showGray'), 'onclick', showGray );
+	dojo.connect(dojo.byId('showSatellite'), 'onclick', showSatellite );
 
 	dojo.connect(dojo.byId('footer'), 'onmouseover', function()
 	{
@@ -354,6 +370,22 @@ function hideProtectedAreas()
 	protectedAreasLayer.setVisibility(false);
 	dojo.removeClass('showProtectedAreas','selected');
 	dojo.addClass('hideProtectedAreas','selected');
+}
+
+function showGray()
+{
+	map.setBasemap("gray");
+	dojo.removeClass(dojo.body(), 'white');
+	dojo.addClass('showGray','selected');
+	dojo.removeClass('showSatellite','selected');
+}
+
+function showSatellite()
+{	
+	map.setBasemap("satellite");
+	dojo.addClass(dojo.body(), 'white');
+	dojo.removeClass('showGray','selected');
+	dojo.addClass('showSatellite','selected');
 }
 
 dojo.addOnLoad(init);

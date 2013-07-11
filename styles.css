@@ -139,3 +139,13 @@ body
 	width: 75px;
 	font-weight: bold;
 }
+
+.white #info,
+.white #controls,
+.white #footer
+{
+	color: #fff;
+}
+.white #controls div 		  {	 color: #ddd;	}
+.white #controls div.selected {  color: #000;	}
+.white #controls div:hover    {  color: #000;	}
