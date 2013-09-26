@@ -36,7 +36,7 @@ body
 #info, #footer
 {
 	right:20px;
-	width: 150px;
+	width: 155px;
 	background: rgba(255,255,255,0.4);	
 }
 
@@ -76,7 +76,7 @@ body
 #controls span
 {
 	display: inline-block;
-	width: 110px;
+	width: 114px;
 }
 
 #controls div
