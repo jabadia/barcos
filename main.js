@@ -3,6 +3,7 @@
 dojo.require("esri.map");
 dojo.require("esri.arcgis.utils");
 dojo.require("esri.tasks.query");
+dojo.require("esri.layers.agstiled");
 dojo.require("esri.dijit.InfoWindowLite");
 
 dojo.require("dojo.date.locale");
@@ -59,6 +60,7 @@ function getTypeName(value,key,data) { return shipsFeatureLayer.types.filter(fun
 function initMap()
 {
 	// -- layers
+	var wmtsLayer = new esri.layers.ArcGISTiledMapServiceLayer('http://www.esridemos.com/arcgis/rest/services/xunta/XuntaBase/MapServer')
 
 	// nautical chart layer (S-57)
 	nauticalChartLayer = new esri.layers.ArcGISDynamicMapServiceLayer(config.nauticalChartUrl);
@@ -116,7 +118,7 @@ function initMap()
 		infoWindowTimeout = window.setTimeout(function() { map.infoWindow.hide() }, 500);
 	})
 
-	map.addLayers([nauticalChartLayer,protectedAreasLayer,shipsLayer,shipsFeatureLayer]);
+	map.addLayers([wmtsLayer,nauticalChartLayer,protectedAreasLayer,shipsLayer,shipsFeatureLayer]);
 
 
 	// -- measure refresh time
