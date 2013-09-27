@@ -25,7 +25,7 @@ var infoWindowTimeout = null;
 
 var shipTypeName = [
 'Desconocido',// 0_gris DESCONOCIDO
-'Ayuda a la Navegación',// 1_pentagono rojo AYUDA A LA NAVEGACIÓN
+'Baliza',// 1_pentagono rojo AYUDA A LA NAVEGACIÓN
 'Pesca',// 2_rosa BARCO DE PESCA/PESQUEROS
 'Remolcador',// 3_azul REMOLCADOR
 'Alta Velocidad',// 4_ amarillo BARCOS RAPIDOS/ALTA VELOCIDAD
@@ -253,7 +253,8 @@ function updateStats()
 				//style='display:block; float: left; -webkit-transform: rotate(-90deg); -moz-transform: rotate(-90deg);'
 				var img = "<img src='"+imgUrl+"' />";
 				var typeName = shipTypeName[ feature.attributes.SHIP_TYPE ];
-				countryCounts += "<li style='clear:both;''>" + img + " " + feature.attributes.shipCount + " " + typeName + "</li>";
+				var typeCount = "<span class='type-count'>" + feature.attributes.shipCount + "</span>";
+				countryCounts += "<li>" + img + " " + typeCount + " " + typeName + "</li>";
 				totalCount += feature.attributes.shipCount;
 			});
 			dojo.byId('shipcount').innerHTML = 
