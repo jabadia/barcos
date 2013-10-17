@@ -11,29 +11,27 @@ dojo.require("dojo.date.locale");
 var map;
 
 var shipsLayer;
-var shipsFeatureLayer;
+var alertsLayer;
+var historyLayer;
 var nauticalChartLayer;
 var protectedAreasLayer;
 
 var waiting = false;
 var playing = false;
 
-var historyVisible = false;
-var alertsVisible = false;
-
 var infoWindowTimeout = null;
 
 var shipTypeName = [
-'Desconocido',// 0_gris DESCONOCIDO
-'Baliza',// 1_pentagono rojo AYUDA A LA NAVEGACIÓN
-'Pesca',// 2_rosa BARCO DE PESCA/PESQUEROS
-'Remolcador',// 3_azul REMOLCADOR
-'Alta Velocidad',// 4_ amarillo BARCOS RAPIDOS/ALTA VELOCIDAD
-'Desconocido',// 5
-'Pasajeros',// 6_ azul oscuro BARCO DE PASAJEROS
-'Carguero',// 7_ verde CARGUERO/BARCO DE CABOTAJE
-'Cisterna',// 8_ naranja BARCOS CISTERNA
-'Yates / Recreo',// 9_ rosa YATES y OTROS
+	'Desconocido',// 0_gris DESCONOCIDO
+	'Baliza',// 1_pentagono rojo AYUDA A LA NAVEGACIÓN
+	'Pesca',// 2_rosa BARCO DE PESCA/PESQUEROS
+	'Remolcador',// 3_azul REMOLCADOR
+	'Alta Velocidad',// 4_ amarillo BARCOS RAPIDOS/ALTA VELOCIDAD
+	'Desconocido',// 5
+	'Pasajeros',// 6_ azul oscuro BARCO DE PASAJEROS
+	'Carguero',// 7_ verde CARGUERO/BARCO DE CABOTAJE
+	'Cisterna',// 8_ naranja BARCOS CISTERNA
+	'Yates / Recreo',// 9_ rosa YATES y OTROS
 ];
 
 
@@ -47,9 +45,10 @@ function init()
 	var options = {
 //		basemap: "satellite",
 		basemap: "gray",
-		center: [-9.2, 42.5], //[-9, 42],	// costa gallega
+		//center: [-9.2, 42.5], //[-9, 42],	// costa gallega
 		//center: [-5.36, 36],	// estrecho de gibraltar
-		zoom: 9
+		center: [0.632, 50.91], // canal de la mancha
+		zoom: 8
 	};
 
 	map = new esri.Map("map", options);
@@ -69,7 +68,7 @@ function init()
 
 function divideByTen(value,key,data) {	return String(value / 10); }
 function toLower(value,key,data) { return value.toLowerCase(); }
-function getTypeName(value,key,data) { return shipsFeatureLayer.types.filter(function(t){ return t.id==value; })[0].name}
+function getTypeName(value,key,data) { return shipsLayer.types.filter(function(t){ return t.id==value; })[0].name}
 
 function initMap()
 {
@@ -84,11 +83,6 @@ function initMap()
 	protectedAreasLayer.setImageFormat('png32');
 	
 	
-	// ships layer
-	shipsLayer = new esri.layers.ArcGISDynamicMapServiceLayer(config.shipsUrl);
-	shipsLayer.setDisableClientCaching(true);
-	shipsLayer.setImageFormat('png32');
-
 	// feture layer to show popups
 	var template = new esri.InfoTemplate();
 	template.setTitle("<img src='flags/${COUNTRY:toLower}.png'/> <b>${NAME}</b>");
@@ -101,20 +95,15 @@ function initMap()
 	infoWindowLite.startup();
 	map.setInfoWindow(infoWindowLite);
 
-	shipsFeatureLayer = new esri.layers.FeatureLayer(config.shipsFeatureUrl + "/0",
+	// ships layer
+	shipsLayer = new esri.layers.FeatureLayer(config.shipsFeatureUrl + "/0",
 	{
 		mode: esri.layers.FeatureLayer.MODE_ONDEMAND,
 		outFields: ["*"],
 		infoTemplate:template
 	});
-	var symbol = new esri.symbol.SimpleMarkerSymbol();
-	symbol.setStyle(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE);
-	symbol.setSize(30);
-	symbol.setColor(new dojo.Color([255,255,255,0]));
-	symbol.setOutline(new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_NULL));
-	shipsFeatureLayer.setRenderer(new esri.renderer.SimpleRenderer(symbol));
 
-	dojo.connect(shipsFeatureLayer,"onMouseOver", function(evt)
+	dojo.connect(shipsLayer,"onMouseOver", function(evt)
 	{
 		//if( map.getScale() < 600000 )
 		{		
@@ -124,24 +113,36 @@ function initMap()
 			map.infoWindow.setTitle(g.getTitle());
 			cancelInfoWindowTimeout();
 			map.infoWindow.show( evt.screenPoint, map.getInfoWindowAnchor(evt.screenPoint));
+			showShipHistory(g.attributes.MMSI);
 		}
 	});
-	dojo.connect(shipsFeatureLayer,"onMouseOut", function(evt)
+	dojo.connect(shipsLayer,"onMouseOut", function(evt)
 	{
 		cancelInfoWindowTimeout();
-		infoWindowTimeout = window.setTimeout(function() { map.infoWindow.hide() }, 500);
+		infoWindowTimeout = window.setTimeout(function() { map.infoWindow.hide(); hideShipHistory(); }, 500);
 	})
 
-	map.addLayers([nauticalChartLayer,protectedAreasLayer,shipsLayer,shipsFeatureLayer]);
+	// alerts layer
+	alertsLayer = new esri.layers.FeatureLayer(config.shipsFeatureUrl + "/1",
+	{
+		outFields: ["*"]
+	});
+
+	// history layer
+	historyLayer = new esri.layers.ArcGISDynamicMapServiceLayer(config.historyUrl);
+	historyLayer.setDisableClientCaching(true);
+	historyLayer.setImageFormat('png32');
+
+	map.addLayers([nauticalChartLayer,protectedAreasLayer,historyLayer,alertsLayer,shipsLayer]);
 
 
 	// -- measure refresh time
 	var updateStartTime;
-	var timerId;
+	var timerId = 0;
 	dojo.connect(shipsLayer,"onUpdateStart", function()
 	{
 		updateStartTime = new Date().getTime();
-		dojo.byId('elapsed').innerHTML = "***";
+		dojo.byId('elapsed').innerHTML = "***";		
 		waiting = true;
 	});
 	dojo.connect(shipsLayer,"onUpdateEnd", function()
@@ -150,9 +151,15 @@ function initMap()
 		dojo.byId('elapsed').innerHTML = "<b>Refresh:</b> " + elapsed/1000 + " sec.";
 		waiting = false;
 
+		if( timerId != 0 )
+		{		
+			window.clearTimeout(timerId);
+			timerId = 0;
+		}
+
 		if( playing )
 		{
-			window.setTimeout( refresh,2500);
+			timerId = window.setTimeout(refresh,2500);
 		}		
 	})
 
@@ -220,9 +227,24 @@ function stop()
 	dojo.addClass('stop','selected');
 }
 
+function showShipHistory(mmsi)
+{
+	historyLayer.setLayerDefinitions([
+		null,
+		null,
+		"MMSI=" + mmsi]);
+	showHistory();
+}
+
+function hideShipHistory()
+{
+	historyLayer.setLayerDefinitions([null,null,null]);
+	hideHistory();
+}
+
 function updateStats()
 {
-	var statsTask = new esri.tasks.QueryTask(config.shipsUrl + "/0");
+	var statsTask = new esri.tasks.QueryTask(config.shipsFeatureUrl + "/0");
 	var query = new esri.tasks.Query();
 	var statsDef1 = new esri.tasks.StatisticDefinition();
 
@@ -273,6 +295,7 @@ function refresh()
 	if( ! waiting )
 	{
 		shipsLayer.refresh();
+		//historyLayer.refresh();
 	}
 	updateStats();
 }
@@ -309,58 +332,34 @@ function clearHistory()
 	})
 }
 
-function setLayerVisibility()
-{
-	if( historyVisible )
-	{
-		dojo.addClass('showHistory','selected');
-		dojo.removeClass('hideHistory','selected');
-	}
-	else
-	{
-		dojo.removeClass('showHistory','selected');
-		dojo.addClass('hideHistory','selected');
-	}
-
-	if( alertsVisible )
-	{
-		dojo.addClass('showAlerts','selected');
-		dojo.removeClass('hideAlerts','selected');
-	}
-	else
-	{
-		dojo.removeClass('showAlerts','selected');
-		dojo.addClass('hideAlerts','selected');
-	}
-
-	var visibleLayers = [0];
-	if( alertsVisible ) visibleLayers.push(1);
-	if( historyVisible ) visibleLayers.push(2);
-	shipsLayer.setVisibleLayers(visibleLayers);
-}
-
 function showHistory()
 {
-	historyVisible = true;
-	setLayerVisibility();
+	historyLayer.setVisibleLayers([2]);
+	historyLayer.setVisibility(true);
+	dojo.addClass('showHistory', 'selected');
+	dojo.removeClass('hideHistory','selected');
 }
 
 function hideHistory()
 {
-	historyVisible = false;
-	setLayerVisibility();
+	historyLayer.setVisibleLayers([2]);
+	historyLayer.setVisibility(false);
+	dojo.removeClass('showHistory', 'selected');
+	dojo.addClass('hideHistory','selected');
 }
 
 function showAlerts()
 {
-	alertsVisible = true;
-	setLayerVisibility();
+	alertsLayer.setVisibility(true);
+	dojo.addClass('showAlerts', 'selected');
+	dojo.removeClass('hideAlerts','selected');
 }
 
 function hideAlerts()
 {
-	alertsVisible = false;
-	setLayerVisibility();
+	alertsLayer.setVisibility(false);
+	dojo.removeClass('showAlerts', 'selected');
+	dojo.addClass('hideAlerts','selected');
 }
 
 function showChart()
