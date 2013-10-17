@@ -23,6 +23,20 @@ var alertsVisible = false;
 
 var infoWindowTimeout = null;
 
+var shipTypeName = [
+'Desconocido',// 0_gris DESCONOCIDO
+'Baliza',// 1_pentagono rojo AYUDA A LA NAVEGACIÓN
+'Pesca',// 2_rosa BARCO DE PESCA/PESQUEROS
+'Remolcador',// 3_azul REMOLCADOR
+'Alta Velocidad',// 4_ amarillo BARCOS RAPIDOS/ALTA VELOCIDAD
+'Desconocido',// 5
+'Pasajeros',// 6_ azul oscuro BARCO DE PASAJEROS
+'Carguero',// 7_ verde CARGUERO/BARCO DE CABOTAJE
+'Cisterna',// 8_ naranja BARCOS CISTERNA
+'Yates / Recreo',// 9_ rosa YATES y OTROS
+];
+
+
 function init()
 {
 	esriConfig.defaults.map.panDuration = 500;	// time in milliseconds, default panDuration: 250
@@ -33,8 +47,8 @@ function init()
 	var options = {
 //		basemap: "satellite",
 		basemap: "gray",
-		//center: [-9, 42],	// costa gallega
-		center: [-5.36, 36],	// estrecho de gibraltar
+		center: [-9.2, 42.5], //[-9, 42],	// costa gallega
+		//center: [-5.36, 36],	// estrecho de gibraltar
 		zoom: 9
 	};
 
@@ -60,7 +74,7 @@ function getTypeName(value,key,data) { return shipsFeatureLayer.types.filter(fun
 function initMap()
 {
 	// -- layers
-	var wmtsLayer = new esri.layers.ArcGISTiledMapServiceLayer('http://www.esridemos.com/arcgis/rest/services/xunta/XuntaBase/MapServer')
+	//var wmtsLayer = new esri.layers.ArcGISTiledMapServiceLayer('http://www.esridemos.com/arcgis/rest/services/xunta/XuntaBase/MapServer')
 
 	// nautical chart layer (S-57)
 	nauticalChartLayer = new esri.layers.ArcGISDynamicMapServiceLayer(config.nauticalChartUrl);
@@ -118,7 +132,7 @@ function initMap()
 		infoWindowTimeout = window.setTimeout(function() { map.infoWindow.hide() }, 500);
 	})
 
-	map.addLayers([wmtsLayer,nauticalChartLayer,protectedAreasLayer,shipsLayer,shipsFeatureLayer]);
+	map.addLayers([nauticalChartLayer,protectedAreasLayer,shipsLayer,shipsFeatureLayer]);
 
 
 	// -- measure refresh time
@@ -225,7 +239,7 @@ function updateStats()
 
 	query.returnGeometry			 = false;
 	query.outStatistics 			 = [statsDef1,statsDef2];
-	query.groupByFieldsForStatistics = ["COUNTRY"];
+	query.groupByFieldsForStatistics = ["SHIP_TYPE"];
 	query.orderByFields 			 = ["shipCount DESC"];
 	query.geometry 					 = map.extent;
 
@@ -235,13 +249,16 @@ function updateStats()
 			var countryCounts = "";
 			var totalCount = 0;
 			result.features.forEach(function(feature) {
-				var imgUrl = "flags/" + feature.attributes.COUNTRY.toLowerCase() + ".png";
+				var imgUrl = "shiptypes/" + feature.attributes.SHIP_TYPE + ".png";
+				//style='display:block; float: left; -webkit-transform: rotate(-90deg); -moz-transform: rotate(-90deg);'
 				var img = "<img src='"+imgUrl+"' />";
-				countryCounts += "<li>" + img + " " + feature.attributes.shipCount + "</li>";
+				var typeName = shipTypeName[ feature.attributes.SHIP_TYPE ];
+				var typeCount = "<span class='type-count'>" + feature.attributes.shipCount + "</span>";
+				countryCounts += "<li>" + img + " " + typeCount + " " + typeName + "</li>";
 				totalCount += feature.attributes.shipCount;
 			});
 			dojo.byId('shipcount').innerHTML = 
-				"<b>Vessel count: </b>" + totalCount +
+				"<b>Número de Barcos: </b>" + totalCount +
 				"<br/><ul>" + countryCounts + "</ul>";
 		},
 		function(error)
