@@ -17,7 +17,6 @@ var nauticalChartLayer;
 var protectedAreasLayer;
 
 var waiting = false;
-var playing = false;
 
 var infoWindowTimeout = null;
 
@@ -151,16 +150,7 @@ function initMap()
 		dojo.byId('elapsed').innerHTML = "<b>Refresh:</b> " + elapsed/1000 + " sec.";
 		waiting = false;
 
-		if( timerId != 0 )
-		{		
-			window.clearTimeout(timerId);
-			timerId = 0;
-		}
-
-		if( playing )
-		{
-			timerId = window.setTimeout(refresh,2500);
-		}		
+		updateStats();
 	})
 
 	// -- update statistics after moving map
@@ -209,20 +199,14 @@ function cancelInfoWindowTimeout()
 
 function play()
 {
-	if(!playing)
-	{
-		playing = true;
-		refresh();
-		console.log("playing");
-	}
+	shipsLayer.setRefreshInterval(1 / 60 * 5);
 	dojo.addClass('play','selected');
 	dojo.removeClass('stop','selected');
 }
 
 function stop()
 {
-	playing = false;
-	console.log("stopped");
+	shipsLayer.setRefreshInterval(0);	
 	dojo.removeClass('play','selected');
 	dojo.addClass('stop','selected');
 }
@@ -295,7 +279,6 @@ function refresh()
 	if( ! waiting )
 	{
 		shipsLayer.refresh();
-		//historyLayer.refresh();
 	}
 	updateStats();
 }
