@@ -4,7 +4,9 @@ dojo.require("esri.map");
 dojo.require("esri.arcgis.utils");
 dojo.require("esri.tasks.query");
 dojo.require("esri.layers.agstiled");
+dojo.require("esri.layers.agstiled");
 dojo.require("esri.dijit.InfoWindowLite");
+dojo.require("esri.layers.graphics");
 
 dojo.require("dojo.date.locale");
 
@@ -47,7 +49,8 @@ function init()
 		//center: [-9.2, 42.5], //[-9, 42],	// costa gallega
 		//center: [-5.36, 36],	// estrecho de gibraltar
 		center: [0.632, 50.91], // canal de la mancha
-		zoom: 8
+		zoom: 8,
+		maxZoom: 18
 	};
 
 	map = new esri.Map("map", options);
@@ -69,13 +72,31 @@ function divideByTen(value,key,data) {	return String(value / 10); }
 function toLower(value,key,data) { return value.toLowerCase(); }
 function getTypeName(value,key,data) { return shipsLayer.types.filter(function(t){ return t.id==value; })[0].name}
 
+function setFlickerFree(layer)
+{
+	var graphicsLayer = new esri.layers.GraphicsLayer({id: layer.id + '_temp', opacity:0.8});
+	map.addLayer(graphicsLayer);
+	layer.on('update-start',function(evt)
+	{
+		graphicsLayer.clear();
+		layer.graphics.forEach(function(g)
+		{
+			graphicsLayer.add(g.toJson());
+		});
+	});
+	layer.on('update-end',function(evt)
+	{
+		graphicsLayer.clear();
+	});		
+}
+
 function initMap()
 {
 	// -- layers
 	//var wmtsLayer = new esri.layers.ArcGISTiledMapServiceLayer('http://www.esridemos.com/arcgis/rest/services/xunta/XuntaBase/MapServer')
 
 	// nautical chart layer (S-57)
-	nauticalChartLayer = new esri.layers.ArcGISDynamicMapServiceLayer(config.nauticalChartUrl);
+	nauticalChartLayer = null;// new esri.layers.ArcGISDynamicMapServiceLayer(config.nauticalChartUrl);
 
 	// protected areas layer
 	protectedAreasLayer = new esri.layers.ArcGISDynamicMapServiceLayer(config.protectedAreasUrl);
@@ -101,6 +122,9 @@ function initMap()
 		outFields: ["*"],
 		infoTemplate:template
 	});
+
+	// HAY QUE PROBARLO!!
+	//setFlickerFree(shipsLayer);	
 
 	dojo.connect(shipsLayer,"onMouseOver", function(evt)
 	{
@@ -132,7 +156,7 @@ function initMap()
 	historyLayer.setDisableClientCaching(true);
 	historyLayer.setImageFormat('png32');
 
-	map.addLayers([nauticalChartLayer,protectedAreasLayer,historyLayer,alertsLayer,shipsLayer]);
+	map.addLayers([/*nauticalChartLayer,*/protectedAreasLayer,historyLayer,alertsLayer,shipsLayer]);
 
 
 	// -- measure refresh time
@@ -185,6 +209,7 @@ function initMap()
 	hideAlerts();
 	hideChart();
 	hideProtectedAreas();
+	//window.setTimeout(showGray,1000);
 	play();
 }
 
@@ -347,16 +372,20 @@ function hideAlerts()
 
 function showChart()
 {
+	/*
 	nauticalChartLayer.setVisibility(true);
 	dojo.addClass('showChart','selected');
 	dojo.removeClass('hideChart','selected');
+	*/
 }
 
 function hideChart()
 {
+	/*
 	nauticalChartLayer.setVisibility(false);
 	dojo.removeClass('showChart','selected');
 	dojo.addClass('hideChart','selected');
+	*/
 }
 
 function showProtectedAreas()
