@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Marine Traffic</title>
+	<link rel="stylesheet" href="http://serverapi.arcgisonline.com/jsapi/arcgis/3.5/js/esri/css/esri.css">
+	<link rel="stylesheet" href="styles.css">
+</head>
+<body>	
+	<div id="map"></div>
+	<div id="info">
+		<div class="title"><b>Visible Area:</b></div>
+		<!--<div id="timestamp">Hora: -</div>-->
+		<div id="shipcount">Vessels: -</div>
+	</div>
+	<div id="controls">
+			<span>Refresh:</span>
+			<div id="play">Play</div>
+			<div id="stop">Stop</div>
+			<br />
+			<span>Protected Areas:</span>
+			<div id="showProtectedAreas">On</div>
+			<div id="hideProtectedAreas">Off</div>
+			<br />
+			<span>Alerts:</span>
+			<div id="showAlerts">On</div>
+			<div id="hideAlerts">Off</div>
+			<br />
+			<span>History:</span>
+			<div id="showHistory">On</div>
+			<div id="hideHistory">Off</div>
+			<div id="clearHistory">Clear</div>
+			<br />
+			<span>Chart:</span>
+			<div id="showChart">On</div>
+			<div id="hideChart">Off</div>
+			<br />
+			<span>Map:</span>
+			<div id="showGray">Gray</div>
+			<div id="showSatellite" style="width: 60px">Satellite</div>
+	</div>
+	<div id="footer">
+		<div id="hosturl"></div>
+		<div id="elapsed">t</div>
+	</div>
+	<script src="http://js.arcgis.com/3.7compact/"></script>
+	<script>
+	var hostUrl = "http://54.217.224.125/arcgis/rest/services";
+	var config = {
+		shipsUrl          : hostUrl + "/GEP_Barcos/Barcos_Vigo/MapServer",
+		shipsFeatureUrl   : hostUrl + "/GEP_Barcos/Barcos_Vigo/FeatureServer",
+		protectedAreasUrl : hostUrl + "/GEP_Barcos/NavigationZones/MapServer", //"/GEP_Barcos/Reserva_Marina/MapServer",
+		nauticalChartUrl  : "http://www.esridemos.com/arcgis/rest/services/s57/RegMar/MapServer/exts/Maritime%20Chart%20Server/MapServer"
+	}
+	</script>
+	<script src="main_ds.js"></script>
+</body>
+</html>
